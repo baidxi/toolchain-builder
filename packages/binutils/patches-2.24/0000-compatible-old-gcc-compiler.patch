@@ -1,0 +1,111 @@
+Index: binutils-2.24/gold/common.cc
+===================================================================
+--- binutils-2.24.orig/gold/common.cc	2013-11-04 23:33:39.000000000 +0800
++++ binutils-2.24/gold/common.cc	2025-02-12 18:27:13.585516808 +0800
+@@ -94,8 +94,8 @@
+     return true;
+ 
+   const Symbol_table* symtab = this->symtab_;
+-  const Sized_symbol<size>* psa = symtab->get_sized_symbol<size>(pa);
+-  const Sized_symbol<size>* psb = symtab->get_sized_symbol<size>(pb);
++  const Sized_symbol<size>* psa = symtab->template get_sized_symbol<size>(pa);
++  const Sized_symbol<size>* psb = symtab->template get_sized_symbol<size>(pb);
+ 
+   // The size.
+   typename Sized_symbol<size>::Size_type sa = psa->symsize();
+Index: binutils-2.24/gold/ehframe.cc
+===================================================================
+--- binutils-2.24.orig/gold/ehframe.cc	2013-11-04 23:33:39.000000000 +0800
++++ binutils-2.24/gold/ehframe.cc	2025-02-12 18:32:18.319190248 +0800
+@@ -1188,17 +1188,17 @@
+ 	 this->unmergeable_cie_offsets_.begin();
+        p != this->unmergeable_cie_offsets_.end();
+        ++p)
+-    o = (*p)->write<size, big_endian>(oview, o, address, addralign,
++    o = (*p)->template write<size, big_endian>(oview, o, address, addralign,
+                                       this->eh_frame_hdr_, &post_fdes);
+   for (Cie_offsets::iterator p = this->cie_offsets_.begin();
+        p != this->cie_offsets_.end();
+        ++p)
+-    o = (*p)->write<size, big_endian>(oview, o, address, addralign,
++    o = (*p)->template write<size, big_endian>(oview, o, address, addralign,
+                                       this->eh_frame_hdr_, &post_fdes);
+   for (Post_fdes::iterator p = post_fdes.begin();
+        p != post_fdes.end();
+        ++p)
+-    o = (*p).fde->write<size, big_endian>(oview, o, address, addralign,
++    o = (*p).fde->template write<size, big_endian>(oview, o, address, addralign,
+ 					  (*p).cie_offset,
+ 					  (*p).fde_encoding,
+ 					  this->eh_frame_hdr_);
+Index: binutils-2.24/gold/object.h
+===================================================================
+--- binutils-2.24.orig/gold/object.h	2013-11-04 23:33:39.000000000 +0800
++++ binutils-2.24/gold/object.h	2025-02-12 18:38:43.951565216 +0800
+@@ -1902,7 +1902,7 @@
+   sized_relobj()
+   { return NULL; }
+ 
+-  const virtual Sized_relobj_file<size, big_endian>*
++  virtual const Sized_relobj_file<size, big_endian>*
+   sized_relobj() const
+   { return NULL; }
+ 
+Index: binutils-2.24/gold/dynobj.cc
+===================================================================
+--- binutils-2.24.orig/gold/dynobj.cc	2013-11-04 23:33:39.000000000 +0800
++++ binutils-2.24/gold/dynobj.cc	2025-02-12 18:31:11.594333968 +0800
+@@ -130,7 +130,7 @@
+ 	  if (xindex_shndx > 0 && xindex_link == i)
+ 	    {
+ 	      Xindex* xindex = new Xindex(this->elf_file_.large_shndx_offset());
+-	      xindex->read_symtab_xindex<size, big_endian>(this, xindex_shndx,
++	      xindex->template read_symtab_xindex<size, big_endian>(this, xindex_shndx,
+ 							   pshdrs);
+ 	      this->set_xindex(xindex);
+ 	    }
+@@ -158,7 +158,7 @@
+ 	  if (xindex_link == this->dynsym_shndx_)
+ 	    {
+ 	      Xindex* xindex = new Xindex(this->elf_file_.large_shndx_offset());
+-	      xindex->read_symtab_xindex<size, big_endian>(this, xindex_shndx,
++	      xindex->template read_symtab_xindex<size, big_endian>(this, xindex_shndx,
+ 							   pshdrs);
+ 	      this->set_xindex(xindex);
+ 	    }
+@@ -192,7 +192,7 @@
+       if (xindex_shndx > 0 && xindex_link == symtab_shndx)
+ 	{
+ 	  Xindex* xindex = new Xindex(this->elf_file_.large_shndx_offset());
+-	  xindex->read_symtab_xindex<size, big_endian>(this, xindex_shndx,
++	  xindex->template read_symtab_xindex<size, big_endian>(this, xindex_shndx,
+ 						       pshdrs);
+ 	  this->set_xindex(xindex);
+ 	}
+@@ -440,7 +440,7 @@
+ {
+   gold_assert(this->dynsym_shndx_ != -1U);
+   Xindex* xindex = new Xindex(this->elf_file_.large_shndx_offset());
+-  xindex->initialize_symtab_xindex<size, big_endian>(this, this->dynsym_shndx_);
++  xindex->template initialize_symtab_xindex<size, big_endian>(this, this->dynsym_shndx_);
+   return xindex;
+ }
+ 
+@@ -1762,7 +1762,7 @@
+   for (p = this->defs_.begin(), i = 0;
+        p != this->defs_.end();
+        ++p, ++i)
+-    pb = (*p)->write<size, big_endian>(dynpool,
++    pb = (*p)->template write<size, big_endian>(dynpool,
+ 				       i + 1 >= this->defs_.size(),
+ 				       pb);
+ 
+@@ -1805,7 +1805,7 @@
+   for (p = this->needs_.begin(), i = 0;
+        p != this->needs_.end();
+        ++p, ++i)
+-    pb = (*p)->write<size, big_endian>(dynpool,
++    pb = (*p)->template write<size, big_endian>(dynpool,
+ 				       i + 1 >= this->needs_.size(),
+ 				       pb);
+ 

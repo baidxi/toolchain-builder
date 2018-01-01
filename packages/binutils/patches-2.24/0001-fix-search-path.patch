@@ -1,0 +1,22 @@
+Index: binutils-2.24/ld/ldfile.c
+===================================================================
+--- binutils-2.24.orig/ld/ldfile.c	2025-02-04 12:03:23.000000000 +0800
++++ binutils-2.24/ld/ldfile.c	2025-02-04 12:03:59.652245448 +0800
+@@ -341,7 +341,7 @@
+      directory first.  */
+   if (! entry->flags.maybe_archive)
+     {
+-      if (entry->flags.sysrooted && IS_ABSOLUTE_PATH (entry->filename))
++      if (entry->flags.sysrooted && !IS_ABSOLUTE_PATH (entry->filename))
+ 	{
+ 	  char *name = concat (ld_sysroot, entry->filename,
+ 			       (const char *) NULL);
+@@ -355,7 +355,7 @@
+       else if (ldfile_try_open_bfd (entry->filename, entry))
+ 	return TRUE;
+ 
+-      if (IS_ABSOLUTE_PATH (entry->filename))
++      if (!IS_ABSOLUTE_PATH (entry->filename))
+ 	return FALSE;
+     }
+ 

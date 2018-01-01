@@ -1,29 +1,30 @@
+export TOP_DIR:=$(CURDIR)
+export DL_DIR:=$(TOP_DIR)/dl
+export OUTPUT_DIR:=$(TOP_DIR)/output
+export BUILD_DIR:=$(TOP_DIR)/build_dir
+export PKG_DIR:=$(TOP_DIR)/packages
+export SOURCE_DIR:=$(BUILD_DIR)/source
 
-export TOPDIR:=$(CURDIR)
-export DLDIR:=$(TOPDIR)/dl
-export OUTPUTDIR:=$(TOPDIR)/output
-export BUILDDIR:=$(TOPDIR)/build
-export PACKAGEDIR:=$(TOPDIR)/package
-
-export HOST_CFLAGS:=-ffunction-sections -fdata-sections
+export HOST_CFLAGS:=-ffunction-sections -fdata-sections -fno-ident
+export HOST_CXXFLAGS:=$(HOST_CFLAGS)
 export HOST_LDFLAGS:=-Wl,--gc-sections
 
 export TARGET_CFLAGS:=$(HOST_CFLAGS)
+export TARGET_CXXFLAGS:=$(HOST_CXXFLAGS)
 export TARGET_LDFLAGS:=$(HOST_LDFLAGS)
 
 export HOSTCC ?= gcc
 
 export SYSROOT_NAME:=sysroot
 
-ifneq ($(wildcard $(TOPDIR)/.config),)
+ifneq ($(wildcard $(TOP_DIR)/.config),)
 
-include $(TOPDIR)/.config
+include $(TOP_DIR)/.config
 
-export GCC_ARCH:=$(strip $(shell $(HOSTCC) --print-multiarch 2>/dev/null))
+export GCC_ARCH:=$(strip $(shell $(HOSTCC) -dumpmachine 2>/dev/null))
 
 ifeq ($(BUILD),)
-# you can copy config.guess to TOPDIR manually
-export BUILD:=$(strip $(shell $(TOPDIR)/config.guess 2>/dev/null))
+export BUILD:=$(strip $(shell $(TOP_DIR)/config.guess 2>/dev/null))
 ifeq ($(BUILD),)
 export BUILD:=$(GCC_ARCH)
 endif
@@ -40,52 +41,35 @@ NATIVE_BUILD:=y
 endif
 endif
 
+ifeq ($(VARIANT),)
+export VARIANT:=generic
+endif
+
 export NATIVE_BUILD PREFIX_USE_GCC_ARCH
 
-WIN_HOST:=$(findstring mingw,$(HOST))
-WIN_HOST:=$(WIN_HOST)$(findstring cygwin,$(HOST))
-WIN_HOST:=$(WIN_HOST)$(findstring msys,$(HOST))
-WIN_HOST:=$(strip $(WIN_HOST))
-
-export WIN_HOST
-
-
-all: dirs target
-	true
-
+all:dirs target
+	@echo "compile complete"
 dirs:
-	mkdir -p $(DLDIR)
+	mkdir -p $(DL_DIR);
+	mkdir -p $(SOURCE_DIR)
+
 
 target: toolchain
 ifeq ($(strip $(NO_TARGET)),)
-	$(MAKE) -f build.mk BUILD_TYPE=target
+	$(MAKE) -f $(PKG_DIR)/package.mk STAGE=target
 else
 	true
 endif
 
 toolchain:
 ifeq ($(NATIVE_BUILD),)
-	$(MAKE) -f build.mk BUILD_TYPE=toolchain
+	make -f $(PKG_DIR)/package.mk STAGE=toolchain
 else
 	true
 endif
 
 else
 all:
-	echo "Missing configure file!"
+	echo "Missing config file!"
 	false
-
 endif
-
-clean:
-	-rm -rf $(BUILDDIR)
-
-dirclean: clean
-	-rm -rf $(OUTPUTDIR)
-
-distclean: dirclean
-	-rm -rf $(DLDIR)
-
-.PHONY: clean dirclean distclean
-
-
