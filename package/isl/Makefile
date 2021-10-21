@@ -1,8 +1,8 @@
 
 NAME=isl
-VERSION=0.22
-SOURCE_FILE=$(NAME)-$(VERSION).tar.xz
-URL=http://isl.gforge.inria.fr/$(SOURCE_FILE)
+VERSION=0.22.1
+SOURCE_FILE=$(NAME)-$(VERSION).tar.bz2
+URL=https://distfiles.macports.org/isl/$(SOURCE_FILE)
 
 PACKAGE_SOURCE_DIR=$(SOURCEDIR)/$(NAME)-$(VERSION)
 PACKAGE_BUILD_DIR=$(HOST_BUILD_DIR)/$(NAME)-$(VERSION)
