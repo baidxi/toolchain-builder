@@ -1,0 +1,31 @@
+Index: b/sim/arm/armemu.c
+===================================================================
+--- a/sim/arm/armemu.c
++++ b/sim/arm/armemu.c
+@@ -1142,7 +1142,9 @@ handle_VFP_move (ARMul_State * state, AR
+ 
+ /* The PC pipeline value depends on whether ARM
+    or Thumb instructions are being executed.  */
++#ifdef MODE32
+ ARMword isize;
++#endif
+ 
+ ARMword
+ #ifdef MODE32
+Index: b/sim/arm/maverick.c
+===================================================================
+--- a/sim/arm/maverick.c
++++ b/sim/arm/maverick.c
+@@ -60,9 +60,9 @@ union maverick_acc_regs
+   long double ld;		/* Acc registers are 72-bits.  */
+ };
+ 
+-struct maverick_regs DSPregs[16];
+-union maverick_acc_regs DSPacc[4];
+-ARMword DSPsc;
++extern struct maverick_regs DSPregs[16];
++extern union maverick_acc_regs DSPacc[4];
++extern ARMword DSPsc;
+ 
+ #define DEST_REG	(BITS (12, 15))
+ #define SRC1_REG	(BITS (16, 19))

@@ -28,7 +28,9 @@ extract: download
 	[ -f $(PACKAGE_SOURCE_DIR)/.extracted ] || ( \
 		mkdir -p $(PACKAGE_SOURCE_DIR); \
 		tar -xf $(DLDIR)/$(SOURCE_FILE) -C $(SOURCEDIR) && \
-		for f in $$(ls ./patches/*.patch ./patches/*.diff); do patch -d $(PACKAGE_SOURCE_DIR) -p1 < $$f; done; \
+		for f in $$(ls ./patches/*.patch ./patches/*.diff); do \
+			patch -d $(PACKAGE_SOURCE_DIR) -p1 < $$f; \
+		done; \
 		touch $(PACKAGE_SOURCE_DIR)/.extracted \
 	)
 
