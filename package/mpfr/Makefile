@@ -1,7 +1,7 @@
 
 NAME=mpfr
-VERSION=4.0.2
-SOURCE_FILE=$(NAME)-$(VERSION).tar.xz
+VERSION=3.1.3
+SOURCE_FILE=$(NAME)-$(VERSION).tar.bz2
 URL=https://ftp.gnu.org/gnu/$(NAME)/$(SOURCE_FILE)
 
 PACKAGE_SOURCE_DIR=$(SOURCEDIR)/$(NAME)-$(VERSION)
@@ -18,7 +18,7 @@ all: install
 	true
 
 download:
-	[ -f $(DLDIR)/$(SOURCE_FILE) ] || wget -O $(DLDIR)/$(SOURCE_FILE) $(URL) || (rm -f $(DLDIR)/$(SOURCE_FILE) && false)
+	[ -f $(DLDIR)/$(SOURCE_FILE) ] || wget -O $(DLDIR)/$(SOURCE_FILE) $(URL) --no-check-certificate || (rm -f $(DLDIR)/$(SOURCE_FILE) && false)
 
 extract: download
 	[ -f $(PACKAGE_SOURCE_DIR)/.extracted ] || ( \

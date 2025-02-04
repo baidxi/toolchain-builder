@@ -1,0 +1,69 @@
+Index: gcc-4.6.3/libquadmath/Makefile.in
+===================================================================
+--- gcc-4.6.3.orig/libquadmath/Makefile.in	2011-09-21 22:37:34.000000000 +0800
++++ gcc-4.6.3/libquadmath/Makefile.in	2025-02-04 18:44:51.635788168 +0800
+@@ -152,7 +152,7 @@
+ 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+ LTCOMPILE = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
+ 	--mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+-	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
++	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -prefer-pic -fPIC
+ CCLD = $(CC)
+ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
+ 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
+Index: gcc-4.6.3/libstdc++-v3/configure
+===================================================================
+--- gcc-4.6.3.orig/libstdc++-v3/configure	2025-02-04 17:13:22.000000000 +0800
++++ gcc-4.6.3/libstdc++-v3/configure	2025-02-04 17:13:51.880797088 +0800
+@@ -65696,7 +65696,7 @@
+ 
+ 
+ if test "$enable_shared" = yes; then
+-  LIBSUPCXX_PICFLAGS="-prefer-pic"
++  LIBSUPCXX_PICFLAGS="-prefer-pic -fPIC"
+ else
+   LIBSUPCXX_PICFLAGS=
+ fi
+Index: gcc-4.6.3/libgomp/Makefile.in
+===================================================================
+--- gcc-4.6.3.orig/libgomp/Makefile.in	2012-03-01 20:03:46.000000000 +0800
++++ gcc-4.6.3/libgomp/Makefile.in	2025-02-04 18:46:30.244797320 +0800
+@@ -106,7 +106,7 @@
+ 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+ LTCOMPILE = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
+ 	--mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+-	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
++	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -prefer-pic -fPIC
+ CCLD = $(CC)
+ SOURCES = $(libgomp_la_SOURCES)
+ MULTISRCTOP = 
+Index: gcc-4.6.3/configure
+===================================================================
+--- gcc-4.6.3.orig/configure	2025-02-04 17:08:41.000000000 +0800
++++ gcc-4.6.3/configure	2025-02-04 17:09:11.000000000 +0800
+@@ -6702,7 +6702,7 @@
+ # Check whether --with-build-sysroot was given.
+ if test "${with_build_sysroot+set}" = set; then :
+   withval=$with_build_sysroot; if test x"$withval" != x ; then
+-     SYSROOT_CFLAGS_FOR_TARGET="--sysroot=$withval"
++     SYSROOT_CFLAGS_FOR_TARGET="--sysroot=$withval -isystem $withval/include"
+    fi
+ else
+   SYSROOT_CFLAGS_FOR_TARGET=
+Index: gcc-4.6.3/libssp/Makefile.in
+===================================================================
+--- gcc-4.6.3.orig/libssp/Makefile.in	2011-02-13 19:45:53.000000000 +0800
++++ gcc-4.6.3/libssp/Makefile.in	2025-02-04 18:43:02.224421224 +0800
+@@ -104,10 +104,10 @@
+ am__depfiles_maybe = depfiles
+ am__mv = mv -f
+ COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
+-	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
++	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) 
+ LTCOMPILE = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
+ 	--mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+-	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
++	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -prefer-pic -fPIC
+ CCLD = $(CC)
+ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
+ 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \

@@ -1,7 +1,7 @@
 
 NAME=gmp
-VERSION=6.2.0
-SOURCE_FILE=$(NAME)-$(VERSION).tar.xz
+VERSION=5.1.3
+SOURCE_FILE=$(NAME)-$(VERSION).tar.bz2
 URL=https://ftp.gnu.org/gnu/$(NAME)/$(SOURCE_FILE)
 
 PACKAGE_SOURCE_DIR=$(SOURCEDIR)/$(NAME)-$(VERSION)
@@ -18,7 +18,7 @@ all: install
 	true
 
 download:
-	[ -f $(DLDIR)/$(SOURCE_FILE) ] || wget -O $(DLDIR)/$(SOURCE_FILE) $(URL) || (rm -f $(DLDIR)/$(SOURCE_FILE) && false)
+	[ -f $(DLDIR)/$(SOURCE_FILE) ] || wget -O $(DLDIR)/$(SOURCE_FILE) $(URL) --no-check-certificate || (rm -f $(DLDIR)/$(SOURCE_FILE) && false)
 
 extract: download
 	[ -f $(PACKAGE_SOURCE_DIR)/.extracted ] || ( \
@@ -33,6 +33,7 @@ configure: extract
 		mkdir -p $(PACKAGE_BUILD_DIR); \
 		cd $(PACKAGE_BUILD_DIR); \
 		ln -sf $(PACKAGE_SOURCE_DIR); \
+		MAKEINFO="$(HOST_OUTPUT_PREFIX)/bin/makeinfo" \
 		CFLAGS="$(HOST_CFLAGS)" \
 		CXXFLAGS="$(HOST_CXXFLAGS)" \
 		LDFLAGS="$(HOST_LDFLAGS)" \

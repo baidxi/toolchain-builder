@@ -1,18 +1,20 @@
 
 CONFIGURE_ARGS += \
+	--disable-libgomp \
 	--enable-lto \
 	--enable-plugins \
 	--enable-largefile \
 	--enable-shared \
-	--enable-static \
-	--enable-nls \
 	--enable-c99 \
+	--enable-nls \
+	--disable-bootstrap \
+	--enable-static \
 	--enable-checking=release \
 	--enable-libstdcxx-debug \
 	--enable-libstdcxx-time=yes \
 	--enable-languages=c,c++,lto \
-	--with-sysroot=$(SYSROOT_PREFIX) \
 	--with-native-system-header-dir=/include
+
 
 ifeq ($(LIBC),newlib)
 CONFIGURE_ARGS += \
@@ -24,9 +26,9 @@ else
 CONFIGURE_ARGS += \
 	--enable-libatomic \
 	--enable-libssp \
-	--enable-libgomp \
 	--enable-threads=posix \
-	--enable-tls
+	--enable-tls	\
+	--enable-libgomp 
 endif
 
 ifneq ($(LIBC),glibc)
@@ -34,3 +36,12 @@ CONFIGURE_ARGS += \
 	--disable-libsanitizer
 endif
 
+ifeq ($(STAGE),target)
+CONFIGURE_ARGS += \
+	$(if $(HOST),--build=$(HOST))	\
+	--with-sysroot=$(TARGET_OUTPUT_DIR)/target$(SYSROOT_PREFIX)	\
+	--with-build-sysroot=$(TARGET_OUTPUT_DIR)/target$(SYSROOT_PREFIX)
+else
+CONFIGURE_ARGS += \
+	--with-sysroot=$(SYSROOT_PREFIX)
+endif

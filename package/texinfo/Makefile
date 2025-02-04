@@ -1,27 +1,20 @@
 
-NAME=gdb
-VERSION=7.4.1
-SOURCE_FILE=$(NAME)-$(VERSION).tar.bz2
+NAME=texinfo
+VERSION=4.13
+SOURCE_FILE=$(NAME)-$(VERSION).tar.gz
 URL=https://ftp.gnu.org/gnu/$(NAME)/$(SOURCE_FILE)
 
 PACKAGE_SOURCE_DIR=$(SOURCEDIR)/$(NAME)-$(VERSION)
-PACKAGE_BUILD_DIR=$(STAGE_BUILD_DIR)/$(NAME)-$(VERSION)
+PACKAGE_BUILD_DIR=$(HOST_BUILD_DIR)/$(NAME)-$(VERSION)
 
 CONFIGURE_ARGS= \
-	--prefix=$(BUILD_PREFIX) \
-	--target=$(TARGET) \
+	--prefix=$(HOST_OUTPUT_PREFIX) \
 	$(if $(HOST),--host=$(HOST)) \
-	--enable-nls \
-	--with-system-zlib
-
-LIBS_CFLAGS := -I$(HOST_OUTPUT_PREFIX)/include
-LIBS_CXXFLAGS := $(LIBS_CFLAGS)
-LIBS_LDFLAGS := -L$(HOST_OUTPUT_PREFIX)/lib
-
-ifeq ($(STAGE),target)
-CONFIGURE_ARGS += \
-	--build=$(HOST)
-endif
+	--enable-extra-encodings \
+	--enable-static \
+	--disable-shared \
+	--disable-nls \
+	--with-gnu-ld
 
 all: install
 	true
@@ -33,9 +26,7 @@ extract: download
 	[ -f $(PACKAGE_SOURCE_DIR)/.extracted ] || ( \
 		mkdir -p $(PACKAGE_SOURCE_DIR); \
 		tar -xf $(DLDIR)/$(SOURCE_FILE) -C $(SOURCEDIR) && \
-		for f in $$(ls ./patches-$(VERSION)/*.patch ./patches-$(VERSION)/*.diff); do \
-			patch -d $(PACKAGE_SOURCE_DIR) -p1 < $$f; \
-		done; \
+		for f in $$(ls ./patches/*.patch ./patches/*.diff); do patch -d $(PACKAGE_SOURCE_DIR) -p1 < $$f; done; \
 		touch $(PACKAGE_SOURCE_DIR)/.extracted \
 	)
 
@@ -44,10 +35,9 @@ configure: extract
 		mkdir -p $(PACKAGE_BUILD_DIR); \
 		cd $(PACKAGE_BUILD_DIR); \
 		ln -sf $(PACKAGE_SOURCE_DIR); \
-		MAKEINFO="$(HOST_OUTPUT_PREFIX)/bin/makeinfo" \
-		CFLAGS="$(HOST_CFLAGS) $(LIBS_CFLAGS)" \
-		CXXFLAGS="$(HOST_CXXFLAGS) $(LIBS_CXXFLAGS)" \
-		LDFLAGS="$(HOST_LDFLAGS) $(LIBS_LDFLAGS)" \
+		CFLAGS="$(HOST_CFLAGS)" \
+		CXXFLAGS="$(HOST_CXXFLAGS)" \
+		LDFLAGS="$(HOST_LDFLAGS)" \
 			$(PACKAGE_SOURCE_DIR:$(SOURCEDIR)/%=%)/configure $(CONFIGURE_ARGS) && \
 		touch $(PACKAGE_BUILD_DIR)/.configured \
 	)
@@ -60,10 +50,10 @@ build: configure
 
 install: build
 	[ -f $(PACKAGE_BUILD_DIR)/.installed ] || ( \
-		$(MAKE) -C $(PACKAGE_BUILD_DIR) install-gdb DESTDIR=$(INSTALL_DIR) && \
+		$(MAKE) -C $(PACKAGE_BUILD_DIR) install && \
 		touch $(PACKAGE_BUILD_DIR)/.installed \
 	)
 
 force-install: build
-	$(MAKE) -C $(PACKAGE_BUILD_DIR) install-gdb DESTDIR=$(INSTALL_DIR)
+	$(MAKE) -C $(PACKAGE_BUILD_DIR) install
 

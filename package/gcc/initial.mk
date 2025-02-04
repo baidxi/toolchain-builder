@@ -11,11 +11,11 @@ CONFIGURE_ARGS += \
 	--disable-libssp \
 	--disable-libsanitizer \
 	--enable-languages=c \
+	--disable-threads \
 	--with-newlib
 
 ifneq ($(LIBC_HEADERS),)
 CONFIGURE_ARGS += \
-	--enable-threads \
 	--enable-tls \
 	--with-build-sysroot=$(BUILD_SYSROOT) \
 	--with-native-system-header-dir=/include

@@ -1,6 +1,6 @@
 
 NAME=mpc
-VERSION=1.1.0
+VERSION=1.0.2
 SOURCE_FILE=$(NAME)-$(VERSION).tar.gz
 URL=https://ftp.gnu.org/gnu/$(NAME)/$(SOURCE_FILE)
 
@@ -19,7 +19,7 @@ all: install
 	true
 
 download:
-	[ -f $(DLDIR)/$(SOURCE_FILE) ] || wget -O $(DLDIR)/$(SOURCE_FILE) $(URL) || (rm -f $(DLDIR)/$(SOURCE_FILE) && false)
+	[ -f $(DLDIR)/$(SOURCE_FILE) ] || wget -O $(DLDIR)/$(SOURCE_FILE) $(URL) --no-check-certificate || (rm -f $(DLDIR)/$(SOURCE_FILE) && false)
 
 extract: download
 	[ -f $(PACKAGE_SOURCE_DIR)/.extracted ] || ( \

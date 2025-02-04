@@ -1,8 +1,8 @@
 
 NAME=xz
 VERSION=5.2.4
-SOURCE_FILE=$(NAME)-$(VERSION).tar.xz
-URL=https://tukaani.org/xz/$(SOURCE_FILE)
+SOURCE_FILE=$(NAME)-$(VERSION).tar.gz
+URL=https://nchc.dl.sourceforge.net/project/lzmautils/$(SOURCE_FILE)
 
 PACKAGE_SOURCE_DIR=$(SOURCEDIR)/$(NAME)-$(VERSION)
 PACKAGE_BUILD_DIR=$(HOST_BUILD_DIR)/$(NAME)-$(VERSION)
@@ -24,7 +24,7 @@ all: install
 	true
 
 download:
-	[ -f $(DLDIR)/$(SOURCE_FILE) ] || wget -O $(DLDIR)/$(SOURCE_FILE) $(URL) || (rm -f $(DLDIR)/$(SOURCE_FILE) && false)
+	[ -f $(DLDIR)/$(SOURCE_FILE) ] || wget -O $(DLDIR)/$(SOURCE_FILE) $(URL) --no-check-certificate || (rm -f $(DLDIR)/$(SOURCE_FILE) && false)
 
 extract: download
 	[ -f $(PACKAGE_SOURCE_DIR)/.extracted ] || ( \

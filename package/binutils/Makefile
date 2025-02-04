@@ -1,7 +1,7 @@
 
 NAME=binutils
-VERSION=2.32
-SOURCE_FILE=$(NAME)-$(VERSION).tar.xz
+VERSION=2.24
+SOURCE_FILE=$(NAME)-$(VERSION).tar.bz2
 URL=https://ftp.gnu.org/gnu/$(NAME)/$(SOURCE_FILE)
 
 PACKAGE_SOURCE_DIR=$(SOURCEDIR)/$(NAME)-$(VERSION)
@@ -10,13 +10,15 @@ PACKAGE_BUILD_DIR=$(STAGE_BUILD_DIR)/$(NAME)-$(VERSION)
 CONFIGURE_ARGS= \
 	--prefix=$(BUILD_PREFIX) \
 	--target=$(TARGET) \
-	$(if $(HOST),--host=$(HOST)) \
+	$(if $(HOST),--build=$(HOST)) \
 	--enable-static \
+	--disable-werror \
 	--disable-shared \
-	--enable-nls \
+	--disable-nls \
+	--enable-relro \
 	--enable-ld \
 	--enable-lto \
-	--enable-gold \
+	--disable-man \
 	--with-sysroot=$(SYSROOT_PREFIX)
 
 LIBS_CFLAGS := -I$(HOST_OUTPUT_PREFIX)/include
@@ -27,13 +29,15 @@ all: install
 	true
 
 download:
-	[ -f $(DLDIR)/$(SOURCE_FILE) ] || wget -O $(DLDIR)/$(SOURCE_FILE) $(URL) || (rm -f $(DLDIR)/$(SOURCE_FILE) && false)
+	[ -f $(DLDIR)/$(SOURCE_FILE) ] || wget -O $(DLDIR)/$(SOURCE_FILE) $(URL) --no-check-certificate || (rm -f $(DLDIR)/$(SOURCE_FILE) && false)
 
 extract: download
 	[ -f $(PACKAGE_SOURCE_DIR)/.extracted ] || ( \
 		mkdir -p $(PACKAGE_SOURCE_DIR); \
 		tar -xf $(DLDIR)/$(SOURCE_FILE) -C $(SOURCEDIR) && \
-		for f in $$(ls ./patches/*.patch ./patches/*.diff); do patch -d $(PACKAGE_SOURCE_DIR) -p1 < $$f; done; \
+		[ -d ./patches-$(VERSION) ] && (	\
+			for f in $$(ls ./patches-$(VERSION)/*.patch ./patches/*.diff); do patch -d $(PACKAGE_SOURCE_DIR) -p1 < $$f; done; \
+		); \
 		touch $(PACKAGE_SOURCE_DIR)/.extracted \
 	)
 
@@ -44,6 +48,7 @@ configure: extract
 		ln -sf $(PACKAGE_SOURCE_DIR); \
 		CFLAGS="$(HOST_CFLAGS) $(LIBS_CFLAGS)" \
 		CXXFLAGS="$(HOST_CXXFLAGS) $(LIBS_CXXFLAGS)" \
+		MAKEINFO="$(HOST_OUTPUT_PREFIX)/bin/makeinfo" \
 		LDFLAGS="$(HOST_LDFLAGS) $(LIBS_LDFLAGS)" \
 			$(PACKAGE_SOURCE_DIR:$(SOURCEDIR)/%=%)/configure $(CONFIGURE_ARGS) && \
 		touch $(PACKAGE_BUILD_DIR)/.configured \

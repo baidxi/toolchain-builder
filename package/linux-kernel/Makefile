@@ -1,13 +1,13 @@
 
 NAME=linux
-VERSION=5.15.80
+VERSION=3.0.1
 SOURCE_FILE=$(NAME)-$(VERSION).tar.xz
-URL=https://cdn.kernel.org/pub/linux/kernel/v5.x/$(SOURCE_FILE)
+URL=https://cdn.kernel.org/pub/linux/kernel/v3.0/$(SOURCE_FILE)
 
 PACKAGE_SOURCE_DIR=$(SOURCEDIR)/$(NAME)-$(VERSION)
 
 download:
-	[ -f $(DLDIR)/$(SOURCE_FILE) ] || wget -O $(DLDIR)/$(SOURCE_FILE) $(URL) || (rm -f $(DLDIR)/$(SOURCE_FILE) && false)
+	[ -f $(DLDIR)/$(SOURCE_FILE) ] || wget -O $(DLDIR)/$(SOURCE_FILE) $(URL) --no-check-certificate || (rm -f $(DLDIR)/$(SOURCE_FILE) && false)
 
 extract: download
 	[ -f $(PACKAGE_SOURCE_DIR)/.extracted ] || ( \

@@ -1,10 +1,9 @@
-
 NAME=gcc
-GCC_VER_MAJOR=7
-GCC_VER_MINOR=5
-GCC_VER_PATCH=0
+GCC_VER_MAJOR=4
+GCC_VER_MINOR=6
+GCC_VER_PATCH=3
 VERSION=$(GCC_VER_MAJOR).$(GCC_VER_MINOR).$(GCC_VER_PATCH)
-SOURCE_FILE=$(NAME)-$(VERSION).tar.xz
+SOURCE_FILE=$(NAME)-$(VERSION).tar.bz2
 URL=https://ftp.gnu.org/gnu/$(NAME)/$(NAME)-$(VERSION)/$(SOURCE_FILE)
 
 PACKAGE_SOURCE_DIR=$(SOURCEDIR)/$(NAME)-$(VERSION)
@@ -20,6 +19,7 @@ CONFIGURE_ARGS= \
 	--enable-fully-dynamic-string \
 	--enable-gnu-unique-object \
 	--enable-clocale=gnu \
+	--disable-libmudflap	\
 	--with-gnu-ld \
 	--with-gnu-as \
 	--with-libiconv \
@@ -48,12 +48,11 @@ endif
 
 include $(GCC_STAGE_MK).mk
 
-
 all: install
 	true
 
 download:
-	[ -f $(DLDIR)/$(SOURCE_FILE) ] || wget -O $(DLDIR)/$(SOURCE_FILE) $(URL) || (rm -f $(DLDIR)/$(SOURCE_FILE) && false)
+	[ -f $(DLDIR)/$(SOURCE_FILE) ] || wget -O $(DLDIR)/$(SOURCE_FILE) $(URL) --no-check-certificate || (rm -f $(DLDIR)/$(SOURCE_FILE) && false)
 
 extract: download
 	[ -f $(PACKAGE_SOURCE_DIR)/.extracted ] || ( \
@@ -70,6 +69,7 @@ configure: extract
 		mkdir -p $(PACKAGE_BUILD_DIR); \
 		cd $(PACKAGE_BUILD_DIR); \
 		ln -sf $(PACKAGE_SOURCE_DIR); \
+		MAKEINFO="$(HOST_OUTPUT_PREFIX)/bin/makeinfo" \
 		CFLAGS="$(HOST_CFLAGS) $(LIBS_CFLAGS)" \
 		CXXFLAGS="$(HOST_CXXFLAGS) $(LIBS_CXXFLAGS)" \
 		LDFLAGS="$(HOST_LDFLAGS) $(LIBS_LDFLAGS)" \
@@ -102,12 +102,22 @@ configure: extract
 	)
 endif
 
+ifeq ($(GCC_STAGE_MK),initial)
+build: configure
+	[ -f $(PACKAGE_BUILD_DIR)/.built ] || ( \
+		$(MAKE) -C $(PACKAGE_BUILD_DIR) \
+		all-build-libiberty \
+		all-gcc \
+		all-target-libgcc && \
+		touch $(PACKAGE_BUILD_DIR)/.built \
+	)
+else
 build: configure
 	[ -f $(PACKAGE_BUILD_DIR)/.built ] || ( \
 		$(MAKE) -C $(PACKAGE_BUILD_DIR) && \
 		touch $(PACKAGE_BUILD_DIR)/.built \
 	)
-
+endif
 install: build
 	[ -f $(PACKAGE_BUILD_DIR)/.installed ] || ( \
 		$(MAKE) -C $(PACKAGE_BUILD_DIR) install DESTDIR=$(INSTALL_DIR) && \
@@ -119,6 +129,10 @@ install: build
 		if [ x"$(INSTALL_DIR)" != x"/" ]; then \
 			find $(FINAL_OUTPUT_DIR)/lib/gcc/$(TARGET)/$(VERSION)/include-fixed -name '*.h' | xargs sed -i 's/$(subst /,\/,$(INSTALL_DIR))//g'; \
 		fi; \
+		[ $(GCC_STAGE_MK) = initial ] && ( \
+			cd $(FINAL_OUTPUT_DIR)/lib/gcc/$(TARGET)/$(VERSION)/ && \
+			ln -s libgcc.a libgcc_eh.a; \
+		); \
 		touch $(PACKAGE_BUILD_DIR)/.installed \
 	)
 

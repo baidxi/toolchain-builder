@@ -35,9 +35,9 @@ export SYSROOT_PREFIX:=$(BUILD_PREFIX)/$(TARGET)/$(SYSROOT_NAME)
 export FINAL_SYSROOT_DIR:=$(FINAL_OUTPUT_DIR)/$(TARGET)/$(SYSROOT_NAME)
 
 ifneq ($(filter-out aarch64 aarch64_eb x86_64 mips64 mips64el,$(TARGET)),)
-export TARGET_LIB_DIR:=/lib64
+export TARGET_LIB_DIR:=$(FINAL_SYSROOT_DIR)/lib64
 else
-export TARGET_LIB_DIR:=/lib
+export TARGET_LIB_DIR:=$(FINAL_SYSROOT_DIR)/lib
 endif
 
 export HOST_OUTPUT_PREFIX:=$(HOST_BUILD_DIR)/install
@@ -105,12 +105,17 @@ expat:
 xz:
 	$(MAKE) -C $(PACKAGEDIR)/xz
 
-binutils: gmp mpfr mpc isl zlib libiconv
+texinfo:
+	$(MAKE) -C $(PACKAGEDIR)/texinfo
+
+binutils: gmp mpfr mpc isl zlib libiconv texinfo
 	$(MAKE) -C $(PACKAGEDIR)/binutils
 
 dir-prep:
 	mkdir -p $(FINAL_SYSROOT_DIR)/lib
+	mkdir -p $(FINAL_SYSROOT_DIR)/usr/lib
 	mkdir -p $(FINAL_SYSROOT_DIR)/include
+	mkdir -p $(FINAL_SYSROOT_DIR)/usr/include
 	ln -sf $(SYSROOT_NAME)/include $(FINAL_OUTPUT_DIR)/$(TARGET)/include
 	mkdir -p $(BUILD_SYSROOT)/lib
 	mkdir -p $(BUILD_SYSROOT)/include
@@ -124,7 +129,7 @@ $(LIBC): linux-headers gcc-initial
 	$(MAKE) -C $(PACKAGEDIR)/$(LIBC)
 
 ifneq ($(LIBC_HEADERS),)
-gcc-minimum: gmp mpfr mpc isl zlib libiconv binutils
+gcc-minimum: gmp mpfr mpc isl zlib libiconv texinfo binutils
 	$(MAKE) -C $(PACKAGEDIR)/gcc GCC_STAGE=minimum
 
 $(LIBC_HEADERS): gcc-minimum dir-prep
