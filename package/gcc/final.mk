@@ -38,10 +38,6 @@ endif
 
 ifeq ($(STAGE),target)
 CONFIGURE_ARGS += \
-	$(if $(HOST),--build=$(HOST))	\
-	--with-sysroot=$(TARGET_OUTPUT_DIR)/target$(SYSROOT_PREFIX)	\
-	--with-build-sysroot=$(TARGET_OUTPUT_DIR)/target$(SYSROOT_PREFIX)
-else
-CONFIGURE_ARGS += \
-	--with-sysroot=$(SYSROOT_PREFIX)
+	$(if $(HOST),--build=$(HOST))
 endif
+
