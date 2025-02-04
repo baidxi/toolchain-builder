@@ -10,7 +10,7 @@ PACKAGE_BUILD_DIR=$(STAGE_BUILD_DIR)/$(NAME)-$(VERSION)
 CONFIGURE_ARGS= \
 	--prefix=$(BUILD_PREFIX) \
 	--target=$(TARGET) \
-	$(if $(HOST),--build=$(HOST)) \
+	$(if $(HOST),--host=$(HOST)) \
 	--enable-static \
 	--disable-werror \
 	--disable-shared \
@@ -24,6 +24,11 @@ CONFIGURE_ARGS= \
 LIBS_CFLAGS := -I$(HOST_OUTPUT_PREFIX)/include
 LIBS_CXXFLAGS := $(LIBS_CFLAGS)
 LIBS_LDFLAGS := -L$(HOST_OUTPUT_PREFIX)/lib
+
+ifeq ($(STAGE),target)
+CONFIGURE_ARGS += \
+	$(if $(HOST),--build=$(HOST))
+endif
 
 all: install
 	true
