@@ -1,10 +1,9 @@
-
-export TOPDIR:=$(CURDIR)
-export DLDIR:=$(TOPDIR)/dl
-export OUTPUTDIR:=$(TOPDIR)/output
-export BUILDDIR:=$(TOPDIR)/build
-export PACKAGEDIR:=$(TOPDIR)/package
-export SOURCEDIR:=$(BUILDDIR)/source
+export TOP_DIR:=$(CURDIR)
+export DL_DIR:=$(TOP_DIR)/dl
+export OUTPUT_DIR:=$(TOP_DIR)/output
+export BUILD_DIR:=$(TOP_DIR)/build_dir
+export PKG_DIR:=$(TOP_DIR)/packages
+export SOURCE_DIR:=$(BUILD_DIR)/source
 
 export HOST_CFLAGS:=-ffunction-sections -fdata-sections -fno-ident
 export HOST_CXXFLAGS:=$(HOST_CFLAGS)
@@ -18,15 +17,14 @@ export HOSTCC ?= gcc
 
 export SYSROOT_NAME:=sysroot
 
-ifneq ($(wildcard $(TOPDIR)/.config),)
+ifneq ($(wildcard $(TOP_DIR)/.config),)
 
-include $(TOPDIR)/.config
+include $(TOP_DIR)/.config
 
 export GCC_ARCH:=$(strip $(shell $(HOSTCC) --print-multiarch 2>/dev/null))
 
 ifeq ($(BUILD),)
-# you can copy config.guess to TOPDIR manually
-export BUILD:=$(strip $(shell $(TOPDIR)/config.guess 2>/dev/null))
+export BUILD:=$(strip $(shell $(TOP_DIR)/config.guess 2>/dev/null))
 ifeq ($(BUILD),)
 export BUILD:=$(GCC_ARCH)
 endif
@@ -49,60 +47,34 @@ endif
 
 export NATIVE_BUILD PREFIX_USE_GCC_ARCH
 
-WIN_HOST:=$(findstring mingw,$(HOST))
-WIN_HOST:=$(WIN_HOST)$(findstring cygwin,$(HOST))
-WIN_HOST:=$(WIN_HOST)$(findstring msys,$(HOST))
-WIN_HOST:=$(strip $(WIN_HOST))
-
-export WIN_HOST
-
-
-all: dirs target
+all:dirs download target
 	true
-
 dirs:
-	mkdir -p $(DLDIR)
+	mkdir -p $(DL_DIR);
+	mkdir -p $(SOURCE_DIR)
+download:
+	( \
+		for pkg in $$(ls $(PKG_DIR)/); do \
+		[ -f ${PKG_DIR}/$${pkg}/Makefile ] && make -C ${PKG_DIR}/$${pkg} download || true; \
+		done;	\
+	)
 
 target: toolchain
 ifeq ($(strip $(NO_TARGET)),)
-	$(MAKE) -f build.mk STAGE=target
+	$(MAKE) -f $(PKG_DIR)/package.mk STAGE=target
 else
 	true
 endif
 
 toolchain:
 ifeq ($(NATIVE_BUILD),)
-	$(MAKE) -f build.mk STAGE=toolchain
+	make -f $(PKG_DIR)/package.mk STAGE=toolchain
 else
 	true
 endif
 
-target_%:
-ifeq ($(strip $(NO_TARGET)),)
-	$(MAKE) -f build.mk STAGE=target $(@:target_%=%)
-endif
-
-toolchain_%:
-ifeq ($(NATIVE_BUILD),)
-	$(MAKE) -f build.mk STAGE=toolchain $(@:toolchain_%=%)
-endif
-
 else
 all:
-	echo "Missing configure file!"
+	echo "Missing config file!"
 	false
-
 endif
-
-clean:
-	-rm -rf $(BUILDDIR)
-
-dirclean: clean
-	-rm -rf $(OUTPUTDIR)
-
-distclean: dirclean
-	-rm -rf $(DLDIR)
-
-.PHONY: clean dirclean distclean
-
-
