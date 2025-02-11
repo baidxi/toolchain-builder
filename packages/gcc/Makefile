@@ -19,7 +19,7 @@ PKG_CONFIGURE_ARGS:=	\
 	--enable-clocale=gnu	\
 	--with-gnu-ld	\
 	--with-gnu-as	\
-	--with-libiconv	\
+	--with-libiconv-prefix=$(HOST_OUTPUT_PREFIX)	\
 	--with-system-zlib \
 	$(TARGET_GCC_FLAGS)
 

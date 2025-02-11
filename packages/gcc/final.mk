@@ -11,6 +11,10 @@ PKG_CONFIGURE_ARGS += \
 	--enable-libstdcxx-debug	\
 	--enable-libstdcxx-time=yes	\
 	--enable-languages=c,c++,lto	\
+	--with-mpc=$(HOST_OUTPUT_PREFIX)	\
+	--with-mpfr=$(HOST_OUTPUT_PREFIX)	\
+	--with-gmp=$(HOST_OUTPUT_PREFIX)	\
+	--with-isl=$(HOST_OUTPUT_PREFIX)	\
 	--with-sysroot=$(SYSROOT_PREFIX)	\
 	--with-native-system-header-dir=/include
 
@@ -42,6 +46,7 @@ configure: extract
 		CFLAGS="$(HOST_CFLAGS) $(LIBS_CFLAGS)"	\
 		CXXFLAGS="$(HOST_CXXFLAGS) $(LIBS_CXXFLAGS)"	\
 		LDFLAGS="$(HOST_LDFLAGS) $(LIBS_LDFLAGS)"	\
+		LIBS="-liconv"	\
 			$(PKG_SOURCE_DIR:$(SOURCE_DIR)/%=%)/configure $(PKG_CONFIGURE_ARGS) && \
 		touch $(PKG_BUILD_DIR)/.configured	\
 	)
