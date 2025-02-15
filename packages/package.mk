@@ -73,7 +73,8 @@ ifeq ($(STRIP_ALL),y)
 endif
 	@$(TOP_DIR)/symlinkconv.sh "$(FINAL_OUTPUT_DIR)"
 	@find $(FINAL_OUTPUT_DIR) -name '*.la' | xargs sed -i -e 's/-L$(subst /,\/,$(HOST_OUTPUT_PREFIX))\/lib//g' -e 's/$(subst /,\/,$(INSTALL_DIR))//g'
-	@cat $(FINAL_SYSROOT_DIR)/lib/libc.so | sed 's|$(TARGET_OUTPUT_DIR)/target||g' | xargs echo > $(FINAL_SYSROOT_DIR)/lib/libc.so
+	@cat $(FINAL_SYSROOT_DIR)/lib/libc.so | sed 's|$(TARGET_OUTPUT_DIR)/target||g' | xargs echo > libc.so.tmp
+	mv libc.so.tmp $(FINAL_SYSROOT_DIR)/lib/libc.so
 endif
 
 dir-prep:
