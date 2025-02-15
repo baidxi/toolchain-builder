@@ -18,11 +18,11 @@ all:install
 	true
 
 download:
-	[ -f $(DL_DIR)/$(PKG_FILE) ] || $(HOST_OUTPUT_PREFIX)/bin/wget -O $(DL_DIR)/$(PKG_FILE) $(PKG_URL) --no-check-certificate || (rm -f $(DL_DIR)/$(PKG_FILE) && false)
+	[ -f $(DL_DIR)/$(PKG_FILE) ] || wget -O $(DL_DIR)/$(PKG_FILE) $(PKG_URL) || (rm -f $(DL_DIR)/$(PKG_FILE) && false)
 
 extract: download
 	[ -f $(PKG_SOURCE_DIR)/.extracted ] || ( \
-		$(HOST_OUTPUT_PREFIX)/bin/tar xf $(DL_DIR)/$(PKG_FILE) -C $(SOURCE_DIR) && \
+		tar xf $(DL_DIR)/$(PKG_FILE) -C $(SOURCE_DIR) && \
 		for f in $$(ls ./patches/*.patch ./patches/*.diff); do patch -d $(PKG_SOURCE_DIR) -p1 < $$f; done; \
 		touch $(PKG_SOURCE_DIR)/.extracted \
 	)
@@ -32,10 +32,13 @@ configure:extract
 		mkdir -p $(PKG_BUILD_DIR);	\
 		cd $(PKG_BUILD_DIR);	\
 		ln -sf $(PKG_SOURCE_DIR);	\
-		$(PKG_SOURCE_DIR:$(SOURCE_DIR)/%=%)/configure $(PKG_CONFIGURE_ARGS) \
-			CFLAGS="$(HOST_CFLAGS)" \
-			CXXFLAGS="$(HOST_CXXFLAGS)" \
-			LDFLAGS="$(HOST_LDFLAGS)" && \
+		AUTOCONF="$(HOST_OUTPUT_PREFIX)/bin/autoconf" \
+		AUTOMAKE="$(HOST_OUTPUT_PREFIX)/bin/automake"	\
+		M4="$(HOST_OUTPUT_PREFIX)/bin/m4"	\
+		CFLAGS="$(HOST_CFLAGS)" \
+		CXXFLAGS="$(HOST_CXXFLAGS)" \
+		LDFLAGS="$(HOST_LDFLAGS)" \
+		$(PKG_SOURCE_DIR:$(SOURCE_DIR)/%=%)/configure $(PKG_CONFIGURE_ARGS) && \
 		touch $(PKG_BUILD_DIR)/.configured \
 	)
 

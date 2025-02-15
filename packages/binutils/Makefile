@@ -1,5 +1,5 @@
 PKG_NAME:=binutils
-PKG_VERSION:=2.24
+PKG_VERSION:=2.44
 PKG_FILE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_URL:=https://mirrors.aliyun.com/gnu/$(PKG_NAME)/$(PKG_FILE)
 
@@ -11,8 +11,9 @@ PKG_CONFIGURE_ARGS:=	\
 	--prefix=$(BUILD_PREFIX) \
 	--target=$(TARGET)	\
 	$(if $(HOST), --host=$(HOST))	\
+	--program-prefix=$(TARGET)-	\
 	--disable-werror	\
-	--disable-gold	\
+	--enable-gold	\
 	--enable-ld	\
 	--enable-lto	\
 	--with-sysroot=$(SYSROOT_PREFIX)
@@ -27,11 +28,11 @@ all:install
 	true
 
 download:
-	[ -f $(DL_DIR)/$(PKG_FILE) ] || $(HOST_OUTPUT_PREFIX)/bin/wget -O $(DL_DIR)/$(PKG_FILE) $(PKG_URL) --no-check-cert  || (rm -f $(DL_DIR)/$(PKG_FILE) && false)
+	[ -f $(DL_DIR)/$(PKG_FILE) ] || wget -O $(DL_DIR)/$(PKG_FILE) $(PKG_URL) || (rm -f $(DL_DIR)/$(PKG_FILE) && false)
 
 extract: download
 	[ -f $(PKG_SOURCE_DIR)/.extracted ] || ( \
-		$(HOST_OUTPUT_PREFIX)/bin/tar xf $(DL_DIR)/$(PKG_FILE) -C $(SOURCE_DIR) && \
+		tar xf $(DL_DIR)/$(PKG_FILE) -C $(SOURCE_DIR) && \
 		for f in $$(ls ./patches-$(PKG_VERSION)/*.patch ./patches-$(PKG_VERSION)/*.diff); do patch -d $(PKG_SOURCE_DIR) -p1 < $$f; done; \
 		touch $(PKG_SOURCE_DIR)/.extracted \
 	)
@@ -42,11 +43,13 @@ configure:extract
 		cd $(PKG_BUILD_DIR);	\
 		ln -sf $(PKG_SOURCE_DIR);	\
 		MAKEINFO="$(HOST_OUTPUT_PREFIX)/bin/makeinfo"	\
-		YACC="$(HOST_OUTPUT_PREFIX)/bin/yacc"	\
+		YACC="$(HOST_OUTPUT_PREFIX)/bin/bison"	\
 		M4="$(HOST_OUTPUT_PREFIX)/bin/m4"	\
-		CFLAGS="$(HOST_CFLAGS)" \
-		CXXFLAGS="$(HOST_CXXFLAGS)" \
-		LDFLAGS="$(HOST_LDFLAGS)" \
+		AWK="$(HOST_OUTPUT_PREFIX)/bin/gawk"	\
+		YFLAGS="-y -d"	\
+		CFLAGS="$(HOST_CFLAGS) -I$(HOST_OUTPUT_PREFIX)/include" \
+		CXXFLAGS="$(HOST_CXXFLAGS) -I$(HOST_OUTPUT_PREFIX)/include" \
+		LDFLAGS="$(HOST_LDFLAGS) -L$(HOST_OUTPUT_PREFIX)/lib" \
 			$(PKG_SOURCE_DIR:$(SOURCE_DIR)/%=%)/configure $(PKG_CONFIGURE_ARGS) && \
 		touch $(PKG_BUILD_DIR)/.configured \
 	)

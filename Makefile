@@ -21,7 +21,7 @@ ifneq ($(wildcard $(TOP_DIR)/.config),)
 
 include $(TOP_DIR)/.config
 
-export GCC_ARCH:=$(strip $(shell $(HOSTCC) -dumpmachine 2>/dev/null))
+export GCC_ARCH:=$(strip $(shell $(HOSTCC) -print-multiarch 2>/dev/null))
 
 ifeq ($(BUILD),)
 export BUILD:=$(strip $(shell $(TOP_DIR)/config.guess 2>/dev/null))

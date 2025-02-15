@@ -1,5 +1,5 @@
 PKG_NAME:=isl
-PKG_VERSION:=0.11.2
+PKG_VERSION:=0.27
 PKG_FILE:=$(PKG_NAME)-$(PKG_VERSION).tar.bz2
 PKG_URL:=https://libisl.sourceforge.io/$(PKG_NAME)-$(PKG_VERSION).tar.gz
 
@@ -12,17 +12,18 @@ PKG_CONFIGURE_ARGS:=	\
 	$(if $(HOST), --host=$(HOST))	\
 	--disable-shared	\
 	--enable-static	\
-	--with-gmp-prefix=$(HOST_OUTPUT_PREFIX)
+	--with-gmp-prefix=$(HOST_OUTPUT_PREFIX)	\
+	--with-gnu-ld
 
 all:install
 	true
 
 download:
-	[ -f $(DL_DIR)/$(PKG_FILE) ] || $(HOST_OUTPUT_PREFIX)/bin/wget -O $(DL_DIR)/$(PKG_FILE) $(PKG_URL) --no-check-cert || (rm -f $(DL_DIR)/$(PKG_FILE) && false)
+	[ -f $(DL_DIR)/$(PKG_FILE) ] ||wget -O $(DL_DIR)/$(PKG_FILE) $(PKG_URL) || (rm -f $(DL_DIR)/$(PKG_FILE) && false)
 
 extract: download
 	[ -f $(PKG_SOURCE_DIR)/.extracted ] || ( \
-		$(HOST_OUTPUT_PREFIX)/bin/tar xf $(DL_DIR)/$(PKG_FILE) -C $(SOURCE_DIR) && \
+		tar xf $(DL_DIR)/$(PKG_FILE) -C $(SOURCE_DIR) && \
 		for f in $$(ls ./patches/*.patch ./patches/*.diff); do patch -d $(PKG_SOURCE_DIR) -p1 < $$f; done; \
 		touch $(PKG_SOURCE_DIR)/.extracted \
 	)

@@ -1,5 +1,5 @@
 PKG_NAME:=autoconf
-PKG_VERSION:=2.62
+PKG_VERSION:=2.72
 PKG_FILE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_URL:=https://mirrors.aliyun.com/gnu/$(PKG_NAME)/$(PKG_FILE)
 
@@ -15,11 +15,11 @@ all:install
 	true
 
 download:
-	[ -f $(DL_DIR)/$(PKG_FILE) ] || $(HOST_OUTPUT_PREFIX)/bin/wget -O $(DL_DIR)/$(PKG_FILE) $(PKG_URL) --no-check-certificate || (rm -f $(DL_DIR)/$(PKG_FILE) && false)
+	[ -f $(DL_DIR)/$(PKG_FILE) ] || wget -O $(DL_DIR)/$(PKG_FILE) $(PKG_URL) || (rm -f $(DL_DIR)/$(PKG_FILE) && false)
 
 extract: download
 	[ -f $(PKG_SOURCE_DIR)/.extracted ] || ( \
-		$(HOST_OUTPUT_PREFIX)/bin/tar xf $(DL_DIR)/$(PKG_FILE) -C $(SOURCE_DIR) && \
+		tar xf $(DL_DIR)/$(PKG_FILE) -C $(SOURCE_DIR) && \
 		for f in $$(ls ./patches/*.patch ./patches/*.diff); do patch -d $(PKG_SOURCE_DIR) -p1 < $$f; done; \
 		touch $(PKG_SOURCE_DIR)/.extracted \
 	)

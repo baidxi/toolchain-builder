@@ -57,7 +57,7 @@ export TOOLCHAIN_PREFIX:=$(TARGET)-
 endif
 endif
 
-all:ext-tools gcc-final gdb
+all: gcc-final gdb
 ifneq ($(TARGET),$(PROGRAM_PREFIX))
 	-find $(FINAL_OUTPUT_DIR)/bin/ -name '$(TARGET)-*' -printf '%P\n' | while read f; do ln -sf "$$f" "$(FINAL_OUTPUT_DIR)/bin/$(PROGRAM_PREFIX)$${f#*$(TARGET)}"; done
 endif
@@ -71,9 +71,7 @@ ifeq ($(STRIP_ALL),y)
 	-find $(FINAL_OUTPUT_DIR)/$(TARGET)/$(SYSROOT_NAME)/sbin | xargs $(TOOLCHAIN_BIN_DIR)/$(TARGET)-strip
 	-find $(FINAL_OUTPUT_DIR)/$(TARGET)/$(SYSROOT_NAME)/libexec | xargs $(TOOLCHAIN_BIN_DIR)/$(TARGET)-strip
 endif
-	@$(TOP_DIR)/symlinkconv.sh "$(FINAL_OUTPUT_DIR)"
 	@find $(FINAL_OUTPUT_DIR) -name '*.la' | xargs sed -i -e 's/-L$(subst /,\/,$(HOST_OUTPUT_PREFIX))\/lib//g' -e 's/$(subst /,\/,$(INSTALL_DIR))//g'
-	@cat $(FINAL_SYSROOT_DIR)/lib/libc.so | sed 's|$(TARGET_OUTPUT_DIR)/target||g' | xargs echo > $(FINAL_SYSROOT_DIR)/lib/libc.so
 endif
 
 dir-prep:
@@ -118,7 +116,7 @@ m4:
 bison: m4 autoconf automake libtool
 	$(MAKE) -C $(PKG_DIR)/bison
 
-binutils: gmp mpfr mpc isl zlib libiconv texinfo bison
+binutils: gmp mpfr mpc isl zlib texinfo gawk
 	$(MAKE) -C $(PKG_DIR)/binutils
 
 autoconf:
@@ -127,6 +125,12 @@ autoconf:
 automake:
 	$(MAKE) -C $(PKG_DIR)/automake
 
+readline: ncurses5
+	$(MAKE) -C $(PKG_DIR)/readline
+
+gawk:libiconv bison readline
+	$(MAKE) -C $(PKG_DIR)/gawk
+
 libtool:
 	$(MAKE) -C $(PKG_DIR)/libtool
 
@@ -134,13 +138,16 @@ expat:
 	$(MAKE) -C $(PKG_DIR)/expat
 
 xz:
-	$(MAKE) -C $(TOP_DIR)/tools/xz
+	$(MAKE) -C $(PKG_DIR)/xz
 
 libunwind:
 	$(MAKE) -C $(PKG_DIR)/libunwind
 
-ext-tools:
-	$(MAKE) -C $(TOP_DIR)/tools
+zstd:
+	$(MAKE) -C $(PKG_DIR)/zstd
+
+gettext: libiconv termcap bison
+	$(MAKE) -C $(PKG_DIR)/gettext
 
 ifneq ($(LIBC),none)
 
@@ -160,14 +167,14 @@ $(LIBC_HEADERS): gcc-minimum dir-prep
 	$(MAKE) -C $(PKG_DIR)/$(LIBC) headers
 endif # $(LIBC_HEADERS) neq " "
 
-gcc-initial: gmp mpfr mpc isl zlib libiconv binutils $(LIBC_HEADERS)
+gcc-initial: gmp mpfr mpc isl zlib libiconv gettext binutils $(LIBC_HEADERS)
 	$(MAKE) -C $(PKG_DIR)/gcc GCC_STAGE=initial
 
 else # $(STAGE) eq toolchain
 $(LIBC): linux-headers
 	$(MAKE) -C $(PKG_DIR)/$(LIBC)
 endif
-gcc-final: binutils zlib libiconv libunwind $(LIBC)
+gcc-final: binutils zlib libiconv libunwind zstd $(LIBC)
 	$(MAKE) -C $(PKG_DIR)/gcc GCC_STAGE=final
 else	# $(LIBC) neq none
 gcc-final: gmp mpfr mpc isl zlib libiconv binutils dir-prep

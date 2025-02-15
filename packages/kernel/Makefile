@@ -1,16 +1,16 @@
 PKG_NAME:=linux
-PKG_VERSION:=3.0.1
+PKG_VERSION:=6.1.1
 PKG_FILE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
-PKG_URL:=https://mirrors.aliyun.com/linux-kernel/v3.x/$(PKG_FILE)
+PKG_URL:=https://mirrors.aliyun.com/linux-kernel/v6.x/$(PKG_FILE)
 
 PKG_SOURCE_DIR:=$(SOURCE_DIR)/$(PKG_NAME)-$(PKG_VERSION)
 
 download:
-	[ -f $(DL_DIR)/$(PKG_FILE) ] || $(HOST_OUTPUT_PREFIX)/bin/wget -O $(DL_DIR)/$(PKG_FILE) $(PKG_URL) --no-check-certificate || (rm -f $(DL_DIR)/$(PKG_FILE) && false)
+	[ -f $(DL_DIR)/$(PKG_FILE) ] ||wget -O $(DL_DIR)/$(PKG_FILE) $(PKG_URL) || (rm -f $(DL_DIR)/$(PKG_FILE) && false)
 
 extract: download
 	[ -f $(PKG_SOURCE_DIR)/.extracted ] || ( \
-		$(HOST_OUTPUT_PREFIX)/bin/tar xf $(DL_DIR)/$(PKG_FILE) -C $(SOURCE_DIR) && \
+		tar xf $(DL_DIR)/$(PKG_FILE) -C $(SOURCE_DIR) && \
 		for f in $$(ls ./patches-$(PKG_VERSION)/*.patch ./patches-$(PKG_VERSION)/*.diff); do patch -d $(PKG_SOURCE_DIR) -p1 < $$f; done; \
 		touch $(PKG_SOURCE_DIR)/.extracted \
 	)

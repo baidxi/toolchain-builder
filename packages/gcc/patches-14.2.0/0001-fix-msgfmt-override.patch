@@ -1,0 +1,13 @@
+Index: b/libstdc++-v3/po/Makefile.in
+===================================================================
+--- a/libstdc++-v3/po/Makefile.in
++++ b/libstdc++-v3/po/Makefile.in
+@@ -388,7 +388,7 @@ locale_builddir = $(glibcxx_localedir)
+ SUFFIXES = .po .mo
+ LOCALE_IN = $(glibcxx_POFILES)
+ LOCALE_OUT = $(glibcxx_MOFILES)
+-MSGFMT = msgfmt
++# MSGFMT = msgfmt
+ 
+ # Necessary files.
+ EXTRA_DIST = string_literals.cc POTFILES.in $(PACKAGE).pot $(LOCALE_IN)
