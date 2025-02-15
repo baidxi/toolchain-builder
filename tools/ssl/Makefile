@@ -4,7 +4,7 @@ PKG_MINOR:=0
 PKG_PATCH:=2u
 PKG_VERSION:=$(PKG_MAJOR).$(PKG_MINOR).$(PKG_PATCH)
 PKG_FILE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
-PKG_URL:=https://github.com/openssl/releases/download/OpenSSL_$(PKG_MAJOR)_$(PKG_MINOR)_$(PKG_PATCH)/$(PKG_NAME)/$(PKG_FILE)
+PKG_URL:=https://github.com/openssl/openssl/releases/download/OpenSSL_$(PKG_MAJOR)_$(PKG_MINOR)_$(PKG_PATCH)/$(PKG_FILE)
 
 
 PKG_BUILD_DIR:=$(HOST_BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)
