@@ -44,9 +44,9 @@ configure:extract
 		MAKEINFO="$(HOST_OUTPUT_PREFIX)/bin/makeinfo"	\
 		YACC="$(HOST_OUTPUT_PREFIX)/bin/yacc"	\
 		M4="$(HOST_OUTPUT_PREFIX)/bin/m4"	\
-		CFLAGS="$(HOST_CFLAGS)" \
-		CXXFLAGS="$(HOST_CXXFLAGS)" \
-		LDFLAGS="$(HOST_LDFLAGS)" \
+		CFLAGS="$(HOST_CFLAGS) -I$(HOST_OUTPUT_PREFIX)/include" \
+		CXXFLAGS="$(HOST_CXXFLAGS) -I$(HOST_OUTPUT_PREFIX)/include" \
+		LDFLAGS="$(HOST_LDFLAGS) -L$(HOST_OUTPUT_PREFIX)/lib" \
 			$(PKG_SOURCE_DIR:$(SOURCE_DIR)/%=%)/configure $(PKG_CONFIGURE_ARGS) && \
 		touch $(PKG_BUILD_DIR)/.configured \
 	)
