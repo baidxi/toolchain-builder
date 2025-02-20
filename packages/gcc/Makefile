@@ -74,7 +74,7 @@ install: build
 		find $(FINAL_OUTPUT_DIR) -name '*.la' | xargs sed -i -e "s/'$(subst /,\/,$(TARGET_OUTPUT_DIR)/toolchain/usr/lib/gcc/$(TARGET)/$(VERSION))'\/libstdc++.la//g"; \
 		find $(FINAL_OUTPUT_DIR) -name '*.la' | xargs sed -i -e "s/'$(subst /,\/,$(BUILD_PREFIX)/lib/gcc/$(TARGET)/$(VERSION))'\/libstdc++.la/-lstdc++/g"; \
 		if [ x"$(INSTALL_DIR)" != x"/" ]; then \
-			find $(FINAL_OUTPUT_DIR)/lib/gcc/$(TARGET)/$(VERSION)/include-fixed -name '*.h' | xargs sed -i 's/$(subst /,\/,$(INSTALL_DIR))//g'; \
+			find $(FINAL_OUTPUT_DIR)/lib/gcc/$(TARGET)/$(PKG_VERSION)/include-fixed -name '*.h' | xargs sed -i 's/$(subst /,\/,$(INSTALL_DIR))//g'; \
 		fi;	\
 		touch $(PKG_BUILD_DIR)/.installed	\
 	)

@@ -79,7 +79,7 @@ configure: extract
 		NM_FOR_TARGET="$(TOOLCHIAN_PREFIX)nm"	\
 		READELF_FOR_TARGET="$(TOOLCHAIN_PREFIX)readelf"	\
 		RANLIB_FOR_TARGET="$(TOOLCHAIN_PREFIX)ranlib" \
-			$(PKG_SOURCE_DIR:$(SOURCE_DIR)/%=%)/configure $(PKG_CONFIGURE_ARGS) --with-build-sysroot="$(INSTALL_DIR)$(BUILD_PREFIX)/$(TARGET)/$(SYSROOT_NAME)"	 && \
+			$(PKG_SOURCE_DIR:$(SOURCE_DIR)/%=%)/configure $(PKG_CONFIGURE_ARGS) && \
 		touch $(PKG_BUILD_DIR)/.configured \
 	)
 endif
