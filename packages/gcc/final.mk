@@ -16,6 +16,7 @@ PKG_CONFIGURE_ARGS += \
 	--with-isl=$(HOST_OUTPUT_PREFIX)	\
 	--with-sysroot=$(SYSROOT_PREFIX)	\
 	--with-zstd=$(HOST_OUTPUT_PREFIX)	\
+	--with-libelf=$(HOST_OUTPUT_PREFIX)	\
 	--with-native-system-header-dir=/include
 
 ifeq ($(LIBC),newlib)

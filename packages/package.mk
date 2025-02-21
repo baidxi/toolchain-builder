@@ -116,7 +116,7 @@ m4:
 bison: m4 autoconf automake libtool
 	$(MAKE) -C $(PKG_DIR)/bison
 
-binutils: gmp mpfr mpc isl zlib texinfo gawk
+binutils: gmp mpfr mpc isl zlib texinfo gawk elfutils
 	$(MAKE) -C $(PKG_DIR)/binutils
 
 autoconf:
@@ -149,6 +149,9 @@ zstd:
 gettext: libiconv termcap bison
 	$(MAKE) -C $(PKG_DIR)/gettext
 
+elfutils: zstd zlib xz libiconv
+	$(MAKE) -C $(PKG_DIR)/elfutils
+
 ifneq ($(LIBC),none)
 
 linux-headers: dir-prep
@@ -174,10 +177,10 @@ else # $(STAGE) eq toolchain
 $(LIBC): linux-headers
 	$(MAKE) -C $(PKG_DIR)/$(LIBC)
 endif
-gcc-final: binutils zlib libiconv libunwind zstd $(LIBC)
+gcc-final: binutils zlib libiconv libunwind $(LIBC) 
 	$(MAKE) -C $(PKG_DIR)/gcc GCC_STAGE=final
 else	# $(LIBC) neq none
-gcc-final: gmp mpfr mpc isl zlib libiconv binutils dir-prep
+gcc-final: gmp mpfr mpc isl zlib libiconv binutils libunwind dir-prep
 	$(MAKE) -C $(PKG_DIR)/gcc GCC_STAGE=final
 endif	# $(LIBC) neq none
 
