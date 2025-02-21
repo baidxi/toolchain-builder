@@ -76,5 +76,10 @@ install: build
 		if [ x"$(INSTALL_DIR)" != x"/" ]; then \
 			find $(FINAL_OUTPUT_DIR)/lib/gcc/$(TARGET)/$(PKG_VERSION)/include-fixed -name '*.h' | xargs sed -i 's/$(subst /,\/,$(INSTALL_DIR))//g'; \
 		fi;	\
+		([ -f $(FINAL_OUTPUT_DIR)/lib/gcc/$(TARGET)/lib64/libgcc_s.so.1 -a $(STAGE) = target ] && \
+			cd $(INSTALL_DIR)$(SYSROOT_PREFIX)/lib; \
+			ln -sf ../../../lib/gcc/$(TARGET)/lib64/libgcc_s.so;  \
+			ln -sf ../../../lib/gcc/$(TARGET)/lib64/libgcc_s.so.1; \
+		)	&& \
 		touch $(PKG_BUILD_DIR)/.installed	\
 	)
