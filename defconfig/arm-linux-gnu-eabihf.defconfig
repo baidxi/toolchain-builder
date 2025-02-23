@@ -1,0 +1,15 @@
+
+export ARCH=arm
+export TARGET=arm-linux-gnueabihf
+export HOST=x86_64-linux-gnu
+
+export VARIANT=arm-linux-gnueabihf-glibc
+export TARGET_GCC_FLAGS=--with-arch=armv7-a --with-abi=aapcs-linux --with-fpu=neon --with-float-abi=hard
+
+export LIBC=glibc
+export LIBC_USE_SOFT_FLOAT=
+export LIBC_DEBUG=
+
+TARGET_CFLAGS += -Os
+export TARGET_CFLAGS
+

@@ -9,8 +9,8 @@ PKG_SOURCE_DIR:=$(SOURCE_DIR)/$(PKG_NAME)-$(PKG_VERSION)
 
 PKG_CONFIGURE_ARGS:=	\
 	--prefix=/	\
-	--build=$(HOST)	\
-	$(if $(HOST), --host=$(TARGET))	\
+	--host=$(TARGET)	\
+	$(if $(HOST),--build=$(HOST))	\
 	--disable-profile	\
 	--disable-werror	\
 	--without-gd	\

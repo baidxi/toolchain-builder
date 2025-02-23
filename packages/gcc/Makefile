@@ -29,7 +29,7 @@ LIBS_CFLAGS := -I$(HOST_OUTPUT_PREFIX)/include
 LIBS_CXXFLAGS := $(LIBS_CFLAGS)
 LIBS_LDFLAGS := -L$(HOST_OUTPUT_PREFIX)/lib
 
-ifneq ($(ARCH),x86)
+ifneq ($(ARCH),x86_64)
 PKG_CONFIGURE_ARGS += --disable-decimal-float
 endif
 
