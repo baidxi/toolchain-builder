@@ -11,12 +11,21 @@ PKG_CONFIGURE_ARGS:=	\
 	--prefix=$(BUILD_PREFIX) \
 	--target=$(TARGET)	\
 	$(if $(HOST), --host=$(HOST))	\
-	--program-prefix=$(TARGET)-	\
+	--with-system-zlib=$(HOST_OUTPUT_PREFIX)	\
+	--with-zstd=$(HOST_OUTPUT_PREFIX)	\
+	--with-sysroot=$(SYSROOT_PREFIX)	\
+	--with-isl=$(HOST_OUTPUT_PREFIX)	\
+	--program-prefix=$(TARGET)-			\
+	acx_cv_cc_gcc_supports_ada=false	\
 	--disable-werror	\
+	--disable-sim	\
+	--disable-multilib	\
+	--enable-plugins	\
+	--enable-deterministic-archives \
 	--enable-gold	\
 	--enable-ld	\
-	--enable-lto	\
-	--with-sysroot=$(SYSROOT_PREFIX)
+	--enable-libssp	\
+	--enable-lto
 
 ifeq ($(STAGE),target)
 PKG_CONFIGURE_ARGS += 	--enable-nls

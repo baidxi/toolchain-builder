@@ -11,14 +11,17 @@ PKG_CONFIGURE_ARGS:=	\
 	--prefix=$(BUILD_PREFIX) \
 	--target=$(TARGET)	\
 	$(if $(HOST), --host=$(HOST))	\
+	$(if x$(NATIVE_BUILD) != xy,--disable-bootstrap)	\
 	--disable-multilib	\
 	--disable-sjlj-exceptions	\
 	--enable-version-specific-runtime-libs	\
 	--enable-fully-dynamic-string	\
 	--enable-gnu-unique-object	\
 	--enable-clocale=gnu	\
+	--enable-__cxa_atexit	\
 	--with-gnu-ld	\
 	--with-gnu-as	\
+	--with-diagnostics-color=auto-if-env	\
 	--with-libiconv-prefix=$(HOST_OUTPUT_PREFIX)	\
 	$(TARGET_GCC_FLAGS)
 
@@ -76,10 +79,12 @@ install: build
 		if [ x"$(INSTALL_DIR)" != x"/" ]; then \
 			find $(FINAL_OUTPUT_DIR)/lib/gcc/$(TARGET)/$(PKG_VERSION)/include-fixed -name '*.h' | xargs sed -i 's/$(subst /,\/,$(INSTALL_DIR))//g'; \
 		fi;	\
-		([ -f $(FINAL_OUTPUT_DIR)/lib/gcc/$(TARGET)/lib64/libgcc_s.so.1 -a $(STAGE) = target ] && \
-			cd $(INSTALL_DIR)$(SYSROOT_PREFIX)/lib; \
-			ln -sf ../../../lib/gcc/$(TARGET)/lib64/libgcc_s.so;  \
-			ln -sf ../../../lib/gcc/$(TARGET)/lib64/libgcc_s.so.1; \
+		( \
+			if [ -f $(FINAL_OUTPUT_DIR)/lib/gcc/$(TARGET)/lib64/libgcc_s.so.1 -a $(STAGE) = target ]; then \
+				cd $(INSTALL_DIR)$(SYSROOT_PREFIX)/lib; \
+				ln -sf ../../../lib/gcc/$(TARGET)/lib64/libgcc_s.so;  \
+				ln -sf ../../../lib/gcc/$(TARGET)/lib64/libgcc_s.so.1; \
+			fi	\
 		)	&& \
 		touch $(PKG_BUILD_DIR)/.installed	\
 	)

@@ -58,8 +58,10 @@ endif
 endif
 
 all: gcc-final gdb
+ifneq ($(PROGRAM_PREFIX),)
 ifneq ($(TARGET),$(PROGRAM_PREFIX))
 	-find $(FINAL_OUTPUT_DIR)/bin/ -name '$(TARGET)-*' -printf '%P\n' | while read f; do ln -sf "$$f" "$(FINAL_OUTPUT_DIR)/bin/$(PROGRAM_PREFIX)$${f#*$(TARGET)}"; done
+endif
 endif
 ifeq ($(STAGE),target)
 ifeq ($(STRIP_ALL),y)

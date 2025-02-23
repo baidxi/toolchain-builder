@@ -9,7 +9,8 @@ PKG_SOURCE_DIR:=$(SOURCE_DIR)/$(PKG_NAME)-$(PKG_VERSION)
 
 PKG_CONFIGURE_ARGS:=	\
 	--prefix=/	\
-	--host=$(TARGET)	\
+	--build=$(HOST)	\
+	$(if $(HOST), --host=$(TARGET))	\
 	--disable-profile	\
 	--disable-werror	\
 	--without-gd	\
@@ -23,11 +24,6 @@ endif
 
 ifeq ($(strip $(LIBC_DEBUG)),y)
 GLIBC_DEBUG_FLAGS:=-g3 -ggdb3 -gdwarf-4
-endif
-
-ENABLE_UNWIND:=
-ifeq ($(STAGE),target)
-PKG_CONFIGURE_ARGS += $(if $(TARGET), --target=$(TARGET))
 endif
 
 LIBS_CFLAGS := -I$(HOST_OUTPUT_PREFIX)/include
